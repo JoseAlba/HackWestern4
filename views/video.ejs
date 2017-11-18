@@ -65,7 +65,6 @@
             $('#picForm').on('click', function(){
                 Webcam.snap(function (data_uri) {
                     $.post("/api/get_pic",{uri: data_uri}, function (data, status) {
-                        alert("\nStatus: " + status);
                         console.log(data);
                     });
                 });

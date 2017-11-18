@@ -5,6 +5,8 @@ var mongoose = require("mongoose");
 var User = require('../models/user');
 
 var imageDataUri = require('image-data-uri');
+var watson = require('watson-developer-cloud');
+var fs = require('fs');
 
 router.post('/register', function(req, res, next){
 
@@ -50,12 +52,32 @@ router.get('/video', function(req, res, next){
 
 router.post('/get_pic', function(req, res, next){
 
-    imageDataUri.outputFile(req.body.uri, './public/images/test')
-                    .then(res => console.log(res))
+    let fileName = './public/images/test' + Date.now() + '.jpeg';
 
-    
+    imageDataUri.outputFile(req.body.uri, fileName)
+                    .then(function(response){
 
-    res.send(req.body);
+                        var visual_recognition = watson.visual_recognition({
+                            api_key: 'd3cd4a458a51b7be65bbd4fa36d3d5a1aac092b8',
+                            version: 'v3',
+                            version_date: '2016-05-20'
+                        });
+
+                        var params = {
+                            images_file: fs.createReadStream(fileName),
+                            classifier_ids: ["ballweapon_1353707080"]
+                        };
+
+                        visual_recognition.classify(params, function(err, r) {
+                            if (err)
+                                res.send(err)
+                            else
+                                res.send(JSON.stringify(r, null, 2));
+                        })
+
+
+                    });
+
 });
 
 module.exports = router;
