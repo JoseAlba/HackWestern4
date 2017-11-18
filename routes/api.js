@@ -8,6 +8,8 @@ var imageDataUri = require('image-data-uri');
 var watson = require('watson-developer-cloud');
 var fs = require('fs');
 
+var config = require("../config");
+
 router.post('/register', function(req, res, next){
 
     let newUser = new User({
@@ -54,6 +56,7 @@ router.post('/get_pic', function(req, res, next){
 
     let fileName = './public/images/test' + Date.now() + '.jpeg';
 
+
     imageDataUri.outputFile(req.body.uri, fileName)
                     .then(function(response){
 
@@ -65,7 +68,7 @@ router.post('/get_pic', function(req, res, next){
 
                         var params = {
                             images_file: fs.createReadStream(fileName),
-                            classifier_ids: ["ballweapon_1353707080"]
+                            classifier_ids: [config.classifier]
                         };
 
                         visual_recognition.classify(params, function(err, r) {
@@ -73,10 +76,41 @@ router.post('/get_pic', function(req, res, next){
                                 res.send(err)
                             else
                                 res.send(JSON.stringify(r, null, 2));
-                        })
-
-
+                        });
+                        
                     });
+
+});
+
+router.post('/get_pic_no_watson', function (req, res, next) {
+
+    let fileName = './public/images/test' + Date.now() + '.jpeg';
+
+
+    imageDataUri.outputFile(req.body.uri, fileName)
+        .then(function (response) {
+
+            // var visual_recognition = watson.visual_recognition({
+            //     api_key: 'd3cd4a458a51b7be65bbd4fa36d3d5a1aac092b8',
+            //     version: 'v3',
+            //     version_date: '2016-05-20'
+            // });
+
+            // var params = {
+            //     images_file: fs.createReadStream(fileName),
+            //     classifier_ids: [config.classifier]
+            // };
+
+            // visual_recognition.classify(params, function (err, r) {
+            //     if (err)
+            //         res.send(err)
+            //     else
+            //         res.send(JSON.stringify(r.images.classifiers.classes, null, 2));
+            // });
+
+            res.send('ok');
+
+        });
 
 });
 

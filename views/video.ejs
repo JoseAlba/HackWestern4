@@ -44,14 +44,18 @@
 
     <!-- Configure a few settings and attach camera -->
     <script language="JavaScript">
+        var w = window.innerWidth;
+        var h = window.innerHeight;
         Webcam.set({
-            width: 320,
-            height: 240,
+            width: 1200,
+            height: 700,
             image_format: 'jpeg',
             jpeg_quality: 90
         });
         Webcam.attach('#my_camera');
     </script>
+
+    <button id="toggle"> toggle </button>
 
     <!-- A button for taking snaps -->
     <form id="picForm">
@@ -62,13 +66,51 @@
     <script language="JavaScript">
         $(document).ready(function(){
 
-            $('#picForm').on('click', function(){
-                Webcam.snap(function (data_uri) {
-                    $.post("/api/get_pic",{uri: data_uri}, function (data, status) {
+            var toggleFlag = false;
+            var interval = null;
+
+            $('#toggle').on('click', function(){
+                if (toggleFlag == false){
+                    toggleFlag = true;
+                }
+                else{
+                    toggleFlag = false;
+                }
+                console.log(toggleFlag);
+
+                if (toggleFlag) {
+                    interval = setInterval(function () {
+                        snap2();
+                    }, 1000);
+                }
+                else {
+                    console.log("stopped...");
+                    clearInterval(interval);
+                }
+            });
+
+
+
+            var snap = function(){
+                 Webcam.snap(function (data_uri) {
+                    $.post("/api/get_pic", { uri: data_uri }, function (data, status) {
                         console.log(data);
                     });
                 });
+            }
+
+            var snap2 = function () {
+                Webcam.snap(function (data_uri) {
+                    $.post("/api/get_pic_no_watson", { uri: data_uri }, function (data, status) {
+                        console.log(data);
+                    });
+                });
+            }
+
+            $('#picForm').on('click', function(){
+                snap();
             });
+
 
 
         })
