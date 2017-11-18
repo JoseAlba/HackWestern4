@@ -19,3 +19,5 @@ Cool Domain name
 
 When threat occures it takes a picture of the perputrator
 
+Use Alexa for alert if possible
+
