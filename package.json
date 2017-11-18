@@ -11,7 +11,12 @@
     "debug": "~2.2.0",
     "ejs": "~2.5.2",
     "express": "~4.14.0",
+    "express-session": "^1.15.6",
+    "express-validator": "^4.3.0",
+    "image-data-uri": "^1.0.1",
+    "mongoose": "^4.13.4",
     "morgan": "~1.7.0",
+    "passport": "^0.4.0",
     "serve-favicon": "~2.3.0"
   }
 }

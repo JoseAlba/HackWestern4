@@ -1,0 +1,81 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>WebcamJS Test Page</title>
+    <style type="text/css">
+        body {
+            font-family: Helvetica, sans-serif;
+        }
+
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        form {
+            margin-top: 15px;
+        }
+
+        form>input {
+            margin-right: 15px;
+        }
+
+        #results {
+            float: right;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid;
+            background: #ccc;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <div id="my_camera"></div>
+
+    <!-- First, include the Webcam.js JavaScript Library -->
+    <script type="text/javascript" src="/javascripts/webcam.min.js"></script>
+
+    <!-- Configure a few settings and attach camera -->
+    <script language="JavaScript">
+        Webcam.set({
+            width: 320,
+            height: 240,
+            image_format: 'jpeg',
+            jpeg_quality: 90
+        });
+        Webcam.attach('#my_camera');
+    </script>
+
+    <!-- A button for taking snaps -->
+    <form id="picForm">
+        <input type=button value="Take Snapshot">
+    </form>
+
+    <!-- Code to handle taking the snapshot and displaying it locally -->
+    <script language="JavaScript">
+        $(document).ready(function(){
+
+            $('#picForm').on('click', function(){
+                Webcam.snap(function (data_uri) {
+                    $.post("/api/get_pic",{uri: data_uri}, function (data, status) {
+                        alert("\nStatus: " + status);
+                        console.log(data);
+                    });
+                });
+            });
+
+
+        })
+
+    </script>
+
+</body>
+
+</html>
