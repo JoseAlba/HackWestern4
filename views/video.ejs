@@ -81,7 +81,7 @@
                 if (toggleFlag) {
                     interval = setInterval(function () {
                         snap2();
-                    }, 1000);
+                    }, 333);
                 }
                 else {
                     console.log("stopped...");
@@ -90,10 +90,9 @@
             });
 
 
-            // WATSON IS TURNED OFF HERE!!
             var snap = function(){
                  Webcam.snap(function (data_uri) {
-                    $.post("/api/get_pic_no_watson", { uri: data_uri }, function (data, status) {
+                    $.post("/api/get_pic", { uri: data_uri }, function (data, status) {
                         console.log(data);
                     });
                 });
