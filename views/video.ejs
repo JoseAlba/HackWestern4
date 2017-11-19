@@ -48,6 +48,7 @@
 
     <!-- Configure a few settings and attach camera -->
     <script language="JavaScript">
+        setTimeout(function(){}, 1000);
         var w = window.innerWidth;
         var h = window.innerHeight;
         Webcam.set({
@@ -62,6 +63,7 @@
     <button id="toggle"> Start Search </button>
     <!-- <button id="tmp"> text </button> -->
     <button id="disbleAlarm">Disable Alarm</button>
+    <button><a href="video"> Refresh </a></button>
 
     <!-- A button for taking snaps -->
     <!-- <form id="picForm">
@@ -80,11 +82,9 @@
             var interval = null;
             var banana = -1;
             var hand = -1;
-            var audioInt;
 
 
-            $('#disbleAlarm').on('click', function(){
-                clearInterval(audioInt);                
+            $('#disbleAlarm').on('click', function(){         
                 $('#alarm').trigger("pause");
                 $('#threat-text').css("visibility", "hidden");
             })
@@ -98,6 +98,7 @@
                 }
 
                 if (toggleFlag) {
+                    setTimeout(function(){}, 5000);
                     interval = setInterval(function () {
                         snap2();
                     }, 1000);
@@ -114,13 +115,11 @@
                  Webcam.snap(function (data_uri) {
                     $.post("/api/get_pic", { uri: data_uri }, function (data, status) {
                         obj = JSON.parse(data);
-                        console.log('\n\n------');
                         
                         obj.images[0].classifiers[0].classes.forEach(function (c) {
                             console.log(c);                            
                         });    
-
-                        console.log('------\n\n');                        
+                      
                     });
                 });
             }
@@ -130,30 +129,21 @@
             var snap2 = function () {
                 Webcam.snap(function (data_uri) {
                     $.post("/api/get_pic_no_watson", { uri: data_uri }, function (data, status) {
+
                         obj = data;
                         var threat = obj.images[0].classifiers[0].classes[0].score;
 
-                        if(threatExceed){
-                            threat = 1;
-                            threatExceed = !threatExceed;
-                        }
-
                         $('#banana').text("Terrorist Threat Level: " + (threat*100).toFixed(1) + "%");                        
 
-                        if (threat > 0.65 && threat < 1) {
+                        if (threat > 0.85) {
                             console.log("TERRORIST ALERT!!!");
                             $('#threat-text').css("visibility", "visible");
 
-                            audioInt = setInterval(function(){
-                                $('#alarm').trigger("play");
-                            }, 1000);
+                            $('#alarm').trigger("play");
 
-                            // $.post("/api/send_text", function(data, status) {
-                            //     console.log("text sent!");
-                            // });
-                        }
-                        else if(threat >= 1){
-                            threatExceed = true;
+                            $.post("/api/send_text", function(data, status) {
+                                console.log("text sent!");
+                            });
                         }
 
                     });
@@ -169,6 +159,7 @@
         })
 
     </script>
+
 
 </body>
 
