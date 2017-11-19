@@ -37,6 +37,10 @@
 
 <body>
 
+    <audio id="alarm">
+        <source src="/alarm.mp3" />
+    </audio>
+
     <div id="my_camera"></div>
 
     <!-- First, include the Webcam.js JavaScript Library -->
@@ -55,19 +59,35 @@
         Webcam.attach('#my_camera');
     </script>
 
-    <button id="toggle"> toggle </button>
+    <button id="toggle"> Start Search </button>
+    <!-- <button id="tmp"> text </button> -->
+    <button id="disbleAlarm">Disable Alarm</button>
 
     <!-- A button for taking snaps -->
-    <form id="picForm">
+    <!-- <form id="picForm">
         <input type=button value="Take Snapshot">
-    </form>
+    </form> -->
+
+    <br>
+    <h1 id="banana">Terrorist Threat Level: 0%</h1>
+    <b id="threat-text" style="font-size: 50px; color: red; position: absolute; top: 0;"><h1>Terrorist threat!</h1></b>
 
     <!-- Code to handle taking the snapshot and displaying it locally -->
     <script language="JavaScript">
         $(document).ready(function(){
-
+            $('#threat-text').css("visibility", "hidden");            
             var toggleFlag = false;
             var interval = null;
+            var banana = -1;
+            var hand = -1;
+            var audioInt;
+
+
+            $('#disbleAlarm').on('click', function(){
+                clearInterval(audioInt);                
+                $('#alarm').trigger("pause");
+                $('#threat-text').css("visibility", "hidden");
+            })
 
             $('#toggle').on('click', function(){
                 if (toggleFlag == false){
@@ -76,12 +96,11 @@
                 else{
                     toggleFlag = false;
                 }
-                console.log(toggleFlag);
 
                 if (toggleFlag) {
                     interval = setInterval(function () {
                         snap2();
-                    }, 333);
+                    }, 1000);
                 }
                 else {
                     console.log("stopped...");
@@ -89,19 +108,54 @@
                 }
             });
 
+            
 
             var snap = function(){
                  Webcam.snap(function (data_uri) {
                     $.post("/api/get_pic", { uri: data_uri }, function (data, status) {
-                        console.log(data);
+                        obj = JSON.parse(data);
+                        console.log('\n\n------');
+                        
+                        obj.images[0].classifiers[0].classes.forEach(function (c) {
+                            console.log(c);                            
+                        });    
+
+                        console.log('------\n\n');                        
                     });
                 });
             }
 
+            var threatExceed = false;
+
             var snap2 = function () {
                 Webcam.snap(function (data_uri) {
                     $.post("/api/get_pic_no_watson", { uri: data_uri }, function (data, status) {
-                        console.log(data);
+                        obj = data;
+                        var threat = obj.images[0].classifiers[0].classes[0].score;
+
+                        if(threatExceed){
+                            threat = 1;
+                            threatExceed = !threatExceed;
+                        }
+
+                        $('#banana').text("Terrorist Threat Level: " + (threat*100).toFixed(1) + "%");                        
+
+                        if (threat > 0.65 && threat < 1) {
+                            console.log("TERRORIST ALERT!!!");
+                            $('#threat-text').css("visibility", "visible");
+
+                            audioInt = setInterval(function(){
+                                $('#alarm').trigger("play");
+                            }, 1000);
+
+                            // $.post("/api/send_text", function(data, status) {
+                            //     console.log("text sent!");
+                            // });
+                        }
+                        else if(threat >= 1){
+                            threatExceed = true;
+                        }
+
                     });
                 });
             }

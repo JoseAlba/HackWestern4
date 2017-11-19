@@ -29,7 +29,7 @@ router.post('/register', function(req, res, next){
             res.send(err);
         }
         else {
-            res.send('user saved!');
+            res.redirect('/api/video');
         }
     });
 
@@ -42,10 +42,10 @@ router.post('/login', function(req, res, next){
         if (!user) res.send('no user found');
         else{
             if (req.body.password == user.password){
-                res.send('logged in');
+                res.redirect('/api/video');                
             }
             else{
-                res.send("invalid user");
+                res.send("invalid user");  
             }
         }
     });
@@ -74,7 +74,8 @@ router.post('/get_pic', function(req, res, next){
 
                         var params = {
                             images_file: fs.createReadStream(fileName),
-                            classifier_ids: [config.classifier]
+                            classifier_ids: [config.classifier],
+                            threshold: 0
                         };
 
                         visual_recognition.classify(params, function(err, r) {
@@ -104,14 +105,15 @@ router.post('/get_pic_no_watson', function (req, res, next) {
 
             var params = {
                 images_file: fs.createReadStream(fileName),
-                classifier_ids: [config.classifier]
+                classifier_ids: [config.classifier],
+                threshold: 0
             };
 
             visual_recognition.classify(params, function (err, r) {
                 if (err)
                     res.send(err)
                 else
-                    res.send(JSON.stringify(r, null, 2));
+                    res.send(r);
             });
 
 
@@ -121,16 +123,27 @@ router.post('/get_pic_no_watson', function (req, res, next) {
 
 
 router.post('/send_text', function(req, res, next){
-
 // Find your account sid and auth token in your Twilio account Console.
     var client = new twilio('ACcacacbab2a9c3c1b04761a94e5c88e05', 'b3021fe51327213787105ae69a5d009b');
 
 // Send the text message.
-    client.messages.create({
-        to: '+15195913542',
-        from: '+12268871471',
-        body: 'Hello from Twilio!'
-    });
 
+    // client.messages.create({
+    //     to: '+15195913542',
+    //     from: '+12268871471',
+    //     body: 'this is a message'
+    // });
+
+    User.find({}).exec(function(err, users){
+        users.forEach(function(user){
+            client.messages.create({
+                to: "+1" + user.phone,
+                from: '+12268871471',
+                body: `WARNING!!!!
+                    THERE IS A TERRORIST ATTACK NEARBY!`
+            });
+        });
+    });
+        
 });
 module.exports = router;
