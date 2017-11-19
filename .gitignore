@@ -1,9 +1,11 @@
 
 #extras
+
 public/
 
 /public/images/
 /public/images.zip
+
 
 # Logs
 logs
