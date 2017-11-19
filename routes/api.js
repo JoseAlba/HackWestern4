@@ -68,7 +68,7 @@ router.post('/get_pic', function(req, res, next){
 
                         var params = {
                             images_file: fs.createReadStream(fileName),
-                            classifier_ids: [config.classifier]
+                            classifier_ids: ["banana_weapon_1899654981"]
                         };
 
                         visual_recognition.classify(params, function(err, r) {
