@@ -8,6 +8,9 @@ var imageDataUri = require('image-data-uri');
 var watson = require('watson-developer-cloud');
 var fs = require('fs');
 
+var twilio = require('twilio');
+
+
 router.post('/register', function(req, res, next){
 
     let newUser = new User({
@@ -80,4 +83,18 @@ router.post('/get_pic', function(req, res, next){
 
 });
 
+
+router.post('/send_text', function(req, res, next){
+
+// Find your account sid and auth token in your Twilio account Console.
+    var client = new twilio('ACcacacbab2a9c3c1b04761a94e5c88e05', 'b3021fe51327213787105ae69a5d009b');
+
+// Send the text message.
+    client.messages.create({
+        to: '+15195913542',
+        from: '+12268871471',
+        body: 'Hello from Twilio!'
+    });
+
+});
 module.exports = router;
