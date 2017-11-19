@@ -50,9 +50,11 @@ router.post('/login', function(req, res, next){
 
 router.get('/video', function(req, res, next){
     res.render('video');
+    console.log(config.classifier);
 });
 
 router.post('/get_pic', function(req, res, next){
+
 
     let fileName = './public/images/test' + Date.now() + '.jpeg';
 
@@ -68,7 +70,7 @@ router.post('/get_pic', function(req, res, next){
 
                         var params = {
                             images_file: fs.createReadStream(fileName),
-                            classifier_ids: ["banana_weapon_1899654981"]
+                            classifier_ids: [config.classifier]
                         };
 
                         visual_recognition.classify(params, function(err, r) {
@@ -90,25 +92,24 @@ router.post('/get_pic_no_watson', function (req, res, next) {
     imageDataUri.outputFile(req.body.uri, fileName)
         .then(function (response) {
 
-            // var visual_recognition = watson.visual_recognition({
-            //     api_key: 'd3cd4a458a51b7be65bbd4fa36d3d5a1aac092b8',
-            //     version: 'v3',
-            //     version_date: '2016-05-20'
-            // });
+            var visual_recognition = watson.visual_recognition({
+                api_key: 'd3cd4a458a51b7be65bbd4fa36d3d5a1aac092b8',
+                version: 'v3',
+                version_date: '2016-05-20'
+            });
 
-            // var params = {
-            //     images_file: fs.createReadStream(fileName),
-            //     classifier_ids: [config.classifier]
-            // };
+            var params = {
+                images_file: fs.createReadStream(fileName),
+                classifier_ids: [config.classifier]
+            };
 
-            // visual_recognition.classify(params, function (err, r) {
-            //     if (err)
-            //         res.send(err)
-            //     else
-            //         res.send(JSON.stringify(r.images.classifiers.classes, null, 2));
-            // });
+            visual_recognition.classify(params, function (err, r) {
+                if (err)
+                    res.send(err)
+                else
+                    res.send(JSON.stringify(r, null, 2));
+            });
 
-            res.send('ok');
 
         });
 
